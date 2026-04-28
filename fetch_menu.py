@@ -38,7 +38,7 @@ NEXT_MONTH_FOUND_FILE = "next_month_found.txt"
 ENTREE_CATEGORIES = {"Lunch Entree", "Entree"}
 
 # Rolling window: keep this many months in the ICS file
-MONTHS_TO_KEEP  = 4
+MONTHS_TO_KEEP  = 2
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; LunchCalendarBot/1.0)",
@@ -290,7 +290,8 @@ def main():
         print("Manual trigger detected — forcing run regardless of date.")
 
     # Determine target month
-    if today.day >= 27:
+    # On 27th or later look for next month, otherwise current month
+    if today.day >= 27 and not force_run:
         target_month, target_year = get_next_month(today.month, today.year)
     else:
         target_month, target_year = today.month, today.year
