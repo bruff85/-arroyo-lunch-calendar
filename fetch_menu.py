@@ -23,6 +23,7 @@ import re
 import requests
 from datetime import datetime, date, timedelta
 import os
+from notify import notify_success, notify_failure
 
 # ─────────────────────────────────────────────
 # CONFIGURATION
@@ -316,6 +317,7 @@ def main():
     if published and target_month_str not in published:
         print(f"  {target_label} not published yet — keeping existing ICS unchanged.")
         print("  Will retry at next scheduled run.")
+        notify_failure("Arroyo Elementary Lunch Calendar", target_label, "Month not in published_months yet.")
         return
 
     # ── Fetch menu data ────────────────────────
@@ -332,6 +334,7 @@ def main():
 
     if not daily_menu:
         print("No menu items found — keeping existing ICS unchanged.")
+        notify_failure("Arroyo Elementary Lunch Calendar", target_label, "Menu data returned no entree items.")
         return
 
     # ── Generate ICS ───────────────────────────
@@ -351,6 +354,7 @@ def main():
 
     save_next_month_found(target_month, target_year)
     print(f"Marked {target_month}/{target_year} as found.")
+    notify_success("Arroyo Elementary Lunch Calendar", target_label, len(daily_menu))
 
     # If we just loaded current month and it's the 27th or later,
     # immediately try to find next month too
