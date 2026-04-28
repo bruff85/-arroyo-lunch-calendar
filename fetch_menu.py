@@ -23,7 +23,7 @@ import re
 import requests
 from datetime import datetime, date, timedelta
 import os
-from notify import notify_success, notify_failure
+from notify import notify_success, notify_found_failure, notify_not_found
 
 # ─────────────────────────────────────────────
 # CONFIGURATION
@@ -317,7 +317,7 @@ def main():
     if published and target_month_str not in published:
         print(f"  {target_label} not published yet — keeping existing ICS unchanged.")
         print("  Will retry at next scheduled run.")
-        notify_failure("Arroyo Elementary Lunch Calendar", target_label, "Month not in published_months yet.")
+        notify_not_found("Arroyo Elementary Lunch Calendar", target_label)
         return
 
     # ── Fetch menu data ────────────────────────
@@ -334,7 +334,7 @@ def main():
 
     if not daily_menu:
         print("No menu items found — keeping existing ICS unchanged.")
-        notify_failure("Arroyo Elementary Lunch Calendar", target_label, "Menu data returned no entree items.")
+        notify_found_failure("Arroyo Elementary Lunch Calendar", target_label, "Menu data returned no entree items.")
         return
 
     # ── Generate ICS ───────────────────────────
