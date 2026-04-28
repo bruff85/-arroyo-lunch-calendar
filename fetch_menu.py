@@ -351,6 +351,36 @@ def main():
 
     save_next_month_found(target_month, target_year)
     print(f"Marked {target_month}/{target_year} as found.")
+
+    # If we just loaded current month and it's the 27th or later,
+    # immediately try to find next month too
+    if today.day >= 27 and target_month == today.month and target_year == today.year:
+        next_month, next_year = get_next_month(target_month, target_year)
+        next_label = datetime(next_year, next_month, 1).strftime("%B %Y")
+        print(f"\nIt's the 27th or later — checking if {next_label} is published yet...")
+        next_month_str = f"{next_year}-{next_month:02d}-01"
+        if next_month_str in published:
+            print(f"  {next_label} is published! Fetching...")
+            try:
+                next_overwrites = fetch_date_overwrites(next_year, next_month)
+                next_daily = parse_daily_menu(next_overwrites)
+                if next_daily:
+                    ics_content = generate_ics(next_daily, next_month, next_year,
+                                               existing_ics_path=OUTPUT_ICS)
+                    new_hash = hashlib.md5(ics_content.encode()).hexdigest()
+                    if file_hash(OUTPUT_ICS) != new_hash:
+                        with open(OUTPUT_ICS, "w", encoding="utf-8") as f:
+                            f.write(ics_content)
+                        print(f"  ICS updated with {next_label} events.")
+                    save_next_month_found(next_month, next_year)
+                    print(f"  Marked {next_month}/{next_year} as found.")
+            except Exception as e:
+                print(f"  Failed to fetch {next_label}: {e}")
+        else:
+            print(f"  {next_label} not published yet — daily retries will continue.")
+            # Clear found flag so daily retries keep looking for next month
+            clear_next_month_found()
+
     print("\nDone! ✅")
 
 
