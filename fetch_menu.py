@@ -70,14 +70,7 @@ def fetch_date_overwrites(year, month):
     Fetch the day-by-day menu data for a given month.
     Returns list of day objects with date and menu items.
     """
-    start_date = f"{year}-{month:02d}-01"
-    # Last day of month
-    if month == 12:
-        end_date = f"{year}-12-31"
-    else:
-        end_date = (date(year, month + 1, 1) - timedelta(days=1)).strftime("%Y-%m-%d")
-
-    url = f"{BASE_URL}/organizations/{ORG_ID}/menus/{MENU_ID}/start_date/{start_date}/end_date/{end_date}/date_overwrites"
+    url = f"{BASE_URL}/organizations/{ORG_ID}/menus/{MENU_ID}/year/{year}/month/{month}/date_overwrites"
     print(f"  Fetching: {url}")
     response = requests.get(url, headers=HEADERS, timeout=30)
     response.raise_for_status()
