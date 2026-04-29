@@ -285,7 +285,7 @@ def main():
 
     # Determine target month
     # On 27th or later look for next month, otherwise current month
-    if today.day >= 27 and not force_run:
+    if today.day >= 27:
         target_month, target_year = get_next_month(today.month, today.year)
     else:
         target_month, target_year = today.month, today.year
@@ -351,10 +351,11 @@ def main():
         with open(OUTPUT_ICS, "w", encoding="utf-8") as f:
             f.write(ics_content)
         print(f"ICS file updated with {len(daily_menu)} new events.")
+        # Only notify success when ICS actually changed (new month loaded)
+        notify_success("Arroyo Elementary Lunch Calendar", target_label, len(daily_menu))
 
     save_next_month_found(target_month, target_year)
     print(f"Marked {target_month}/{target_year} as found.")
-    notify_success("Arroyo Elementary Lunch Calendar", target_label, len(daily_menu))
 
     # If we just loaded current month and it's the 27th or later,
     # immediately try to find next month too
