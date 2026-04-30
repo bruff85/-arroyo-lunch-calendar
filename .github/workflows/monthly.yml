@@ -3,6 +3,7 @@ name: Generate Monthly Lunch Calendar
 on:
   schedule:
     - cron: '15 4 28 * *'   # 27th 8:15pm PT = 28th 4:15 UTC
+    - cron: '15 14 * * *'   # 7am PT daily
     - cron: '15 18 * * *'   # 10am PT daily
     - cron: '15 2 * * *'    # 6pm PT daily
 
