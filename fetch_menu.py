@@ -228,8 +228,28 @@ def generate_ics(daily_menu, month, year, existing_ics_path=None):
 # SCHEDULE HELPERS
 # ─────────────────────────────────────────────
 
+def is_second_to_last_day(today):
+    """Returns True if today is the second to last day of the month."""
+    import calendar
+    last_day = calendar.monthrange(today.year, today.month)[1]
+    return today.day == last_day - 1
+
+
+def is_last_day_of_month(today):
+    """Returns True if today is the last day of the month."""
+    import calendar
+    last_day = calendar.monthrange(today.year, today.month)[1]
+    return today.day == last_day
+
+
 def should_run_today(today):
-    return today.day >= 27 or today.day <= 15
+    """
+    Run on:
+    - Second to last day of month at 5:30pm PT (initial search)
+    - Last day of month at 5:30pm PT (second attempt)
+    - 1st through 15th daily (retries until next month found)
+    """
+    return is_second_to_last_day(today) or is_last_day_of_month(today) or today.day <= 15
 
 
 def get_next_month(month, year):
@@ -285,7 +305,7 @@ def main():
 
     # Determine target month
     # On 27th or later look for next month, otherwise current month
-    if today.day >= 27:
+    if is_second_to_last_day(today) or is_last_day_of_month(today):
         target_month, target_year = get_next_month(today.month, today.year)
     else:
         target_month, target_year = today.month, today.year
@@ -294,7 +314,7 @@ def main():
     print(f"Target month: {target_label}")
 
     # Reset found flag on 27th
-    if today.day == 27:
+    if is_second_to_last_day(today):
         print("Starting new monthly search cycle — resetting found flag.")
         clear_next_month_found()
 
